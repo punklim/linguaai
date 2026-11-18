@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LinguaAI — Apprentissage des Langues & Tuteur IA</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">🌍</span>
+        <div>
+          <h1>LinguaAI</h1>
+          <p>Anglais • Français • Espagnol • Italien</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="global-score" title="Points cumulés et série de jours">🏆 <span id="totalPoints">0</span> pts · 🔥 <span id="streak">0</span> j</div>
+        <div class="daily-goal" title="Objectif quotidien">
+          <div class="goal-bar"><div class="goal-fill" id="goalFill"></div></div>
+          <span id="goalText">0/20</span>
+        </div>
+
+        <!-- Sélecteur de langue avec drapeaux -->
+        <div class="lang-picker" id="langPicker">
+          <button type="button" class="lang-btn" id="langBtn" aria-haspopup="listbox">
+            <img id="langFlag" class="flag" alt="">
+            <span id="langLabel"></span>
+            <span class="caret">▾</span>
+          </button>
+          <ul class="lang-menu hidden" id="langMenu" role="listbox"></ul>
+
+          <!-- select caché : garde la compatibilité avec app.js -->
+          <select id="langSelect" class="hidden" aria-label="Langue à apprendre">
+            <option value="en">Anglais (English)</option>
+            <option value="es">Espagnol (Español)</option>
+            <option value="it">Italien (Italiano)</option>
+            <option value="fr">Français (Français)</option>
+          </select>
+        </div>
+
+        <select id="levelSelect" aria-label="Niveau">
+          <option value="debutant">Niveau : Débutant</option>
+          <option value="intermediaire">Niveau : Intermédiaire</option>
+          <option value="professionnel">Niveau : Professionnel</option>
+        </select>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="flashcards">🗂️ Cartes</button>
+      <button class="tab-btn" data-tab="grammar">📘 Grammaire</button>
+      <button class="tab-btn" data-tab="quiz">🎯 Quiz</button>
+      <button class="tab-btn" data-tab="pron">🗣️ Répète</button>
+      <button class="tab-btn" data-tab="exercises">✍️ Exercices</button>
+      <button class="tab-btn" data-tab="tutor">🤖 Chat IA</button>
+      <button class="tab-btn" data-tab="liveTutor">📹 Face-à-Face</button>
+      <button class="tab-btn" data-tab="progress">📈 Progrès</button>
+    </nav>
+
+    <!-- 1 : CARTES -->
+    <main id="flashcards" class="tab-content active">
+      <div class="progress-info">
+        <span id="cardCounter">Carte 1 / 6</span>
+        <span class="hint">Clique sur la carte pour voir la traduction</span>
+      </div>
+      <div class="flashcard-wrapper">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="badge" id="cardCategory">Salutation</span>
+            <h2 id="cardWord">Hello, how are you?</h2>
+            <p class="phonetic" id="cardPhonetic"></p>
+            <button class="btn-audio" id="speakCardBtn" type="button">🔊 Écouter</button>
+          </div>
+          <div class="card-face card-back">
+            <span class="badge">Traduction</span>
+            <h2 id="cardTranslation"></h2>
+            <p class="example" id="cardExample"></p>
+          </div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="btn secondary" id="prevCardBtn" type="button">← Précédente</button>
+        <button class="btn secondary" id="slowBtn" type="button" title="Voix lente">🐢 Lent : non</button>
+        <button class="btn primary" id="nextCardBtn" type="button">Suivante →</button>
+      </div>
+      <div class="card-actions know-row">
+        <button class="btn warn" id="reviewBtn" type="button">🔁 À revoir</button>
+        <button class="btn success" id="knowBtn" type="button">✅ Je connais</button>
+      </div>
+      <div class="card-actions" style="margin-top:16px">
+        <button class="btn secondary" id="genCardsBtn" type="button">✨ Générer 10 cartes IA</button>
+      </div>
+    </main>
+
+    <!-- 2 : GRAMMAIRE -->
+    <main id="grammar" class="tab-content">
+      <h3 class="section-title">📘 Leçons de grammaire ciblées</h3>
+      <div id="grammarList" class="grammar-grid"></div>
+    </main>
+
+    <!-- 3 : QUIZ -->
+    <main id="quiz" class="tab-content">
+      <div class="quiz-header">
+        <span id="quizProgress">Question 1 / 6</span>
+        <span class="score-badge">Score : <strong id="quizScore">0</strong> · Meilleur : <strong id="bestScore">0</strong></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="quizBar"></div></div>
+      <label class="check-row"><input type="checkbox" id="listenMode"> 🎧 Mode écoute (la question est dite à voix haute, sans texte)</label>
+      <div class="quiz-box">
+        <p class="quiz-prompt">Comment traduit-on :</p>
+        <h2 id="quizQuestion">...</h2>
+        <button class="btn-audio small" id="speakQuizBtn" type="button">🔊 Écouter</button>
+        <div class="options-grid" id="quizOptions"></div>
+        <p class="feedback" id="quizFeedback"></p>
+        <button class="btn primary hidden" id="nextQuizBtn" type="button">Question suivante →</button>
+      </div>
+    </main>
+
+    <!-- 4 : RÉPÈTE -->
+    <main id="pron" class="tab-content">
+      <div class="progress-info">
+        <span id="pronCounter">Phrase 1 / 6</span>
+        <span class="hint">Écoute le modèle, puis répète la phrase à voix haute</span>
+      </div>
+      <div class="pron-card">
+        <span class="badge" id="pronCat"></span>
+        <h2 id="pronTarget"></h2>
+        <p class="phonetic" id="pronPhon"></p>
+        <p class="example" id="pronTrans"></p>
+      </div>
+      <div class="live-controls">
+        <button class="btn-audio" id="pronListenBtn" type="button">🔊 Écouter le modèle</button>
+        <button class="btn primary" id="pronMicBtn" type="button">🎤 Je répète</button>
+        <label class="check-row inline"><input type="checkbox" id="pronSlow"> 🐢 Voix lente</label>
+      </div>
+      <p class="subtext center" id="pronStatus"></p>
+      <div class="pron-result hidden" id="pronResult">
+        <div class="pron-score" id="pronScoreBox"><strong id="pronScore">0 %</strong><span id="pronVerdict"></span></div>
+        <p class="pron-words" id="pronWords"></p>
+        <p class="subtext" id="pronHeard"></p>
+      </div>
+      <form class="chat-form" id="pronForm">
+        <input type="text" id="pronInput" placeholder="Pas de micro ? Écris la phrase de mémoire…" autocomplete="off">
+        <button class="btn secondary" type="submit">Vérifier</button>
+      </form>
+      <div class="card-actions" style="margin-top:16px">
+        <button class="btn secondary" id="pronPrevBtn" type="button">← Précédente</button>
+        <button class="btn primary" id="pronNextBtn" type="button">Suivante →</button>
+      </div>
+    </main>
+
+    <!-- 5 : EXERCICES -->
+    <main id="exercises" class="tab-content">
+      <h3 class="section-title">✍️ Exercices</h3>
+      <div class="exercise-tabs">
+        <button class="ex-tab active" data-ex="fill">À trous</button>
+        <button class="ex-tab" data-ex="order">Mots en ordre</button>
+        <button class="ex-tab" data-ex="dict">Dictée</button>
+      </div>
+      <div id="exerciseContent" class="exercise-box">
+        <!-- Contenu injecté par JS -->
+      </div>
+      <div class="card-actions" style="margin-top:16px">
+        <button class="btn secondary" id="nextExBtn" type="button">Exercice suivant →</button>
+      </div>
+    </main>
+
+    <!-- 6 : CHAT IA -->
+    <main id="tutor" class="tab-content">
+      <div class="tutor-header">
+        <div>
+          <h3>Conversation avec ton tuteur IA</h3>
+          <p class="subtext">Écris ou dicte dans la langue choisie : l'IA répond et corrige tes fautes.</p>
+        </div>
+        <span class="mode-pill" id="chatMode"></span>
+      </div>
+      <div class="chat-window" id="chatWindow"></div>
+      <div class="quick-prompts" id="quickPrompts"></div>
+      <form class="chat-form" id="chatForm">
+        <button class="btn secondary" id="micBtn" type="button" title="Dicter">🎤</button>
+        <input type="text" id="chatInput" placeholder="Écris un message..." autocomplete="off" required>
+        <button class="btn primary" type="submit">Envoyer</button>
+      </form>
+    </main>
+
+    <!-- 7 : FACE-À-FACE -->
+    <main id="liveTutor" class="tab-content">
+      <div class="live-top">
+        <div class="live-picks">
+          <label class="avatar-pick">Professeur :
+            <select id="avatarSelect">
+              <option value="femme">👩 Sarah</option>
+              <option value="homme">👨 James</option>
+              <option value="robot">🤖 Robo</option>
+            </select>
+          </label>
+          <label class="avatar-pick">Scénario :
+            <select id="scenarioSelect">
+              <option value="libre">💬 Conversation libre</option>
+              <option value="restaurant">🍽️ Au restaurant</option>
+              <option value="aeroport">✈️ À l'aéroport</option>
+              <option value="entretien">💼 Entretien d'embauche</option>
+              <option value="support">🛠️ Support technique</option>
+            </select>
+          </label>
+        </div>
+        <span class="mode-pill" id="liveMode"></span>
+      </div>
+
+      <div class="video-screens">
+        <div class="screen ai-screen" id="aiBox">
+          <div class="avatar-stage" id="avatarStage"></div>
+          <div class="speech-indicator" id="aiStatus">Prêt pour le cours</div>
+          <span id="aiName">Sarah (Professeure IA)</span>
+        </div>
+        <div class="screen user-screen" id="userBox">
+          <video id="webcam" autoplay playsinline muted></video>
+          <span>Toi (Caméra)</span>
+        </div>
+      </div>
+
+      <div class="live-controls">
+        <button class="btn primary" id="startLiveBtn" type="button">🚀 Démarrer le cours</button>
+        <button class="btn secondary" id="manualListenBtn" type="button" disabled>🎙️ Répondre maintenant</button>
+        <button class="btn secondary" id="repeatBtn" type="button" disabled>🔁 Répéter la question</button>
+        <button class="btn danger hidden" id="stopLiveBtn" type="button">🛑 Terminer</button>
+      </div>
+
+      <div class="live-dialogue-box" id="liveDialogue">
+        <p class="muted"><em>Clique sur « Démarrer le cours » : le professeur te pose une question à voix haute, puis écoute ta réponse. Si tu fais une faute, il te la corrige.</em></p>
+      </div>
+
+      <form class="chat-form live-form" id="liveForm">
+        <input type="text" id="liveInput" placeholder="Ou écris ta réponse ici si le micro ne marche pas..." autocomplete="off">
+        <button class="btn primary" type="submit">Envoyer</button>
+      </form>
+
+      <div id="courseSummary" class="summary-box hidden">
+        <h4>📋 Bilan de la session</h4>
+        <div id="summaryContent"></div>
+        <button class="btn secondary small" id="closeSummaryBtn" type="button">Fermer</button>
+      </div>
+    </main>
+
+    <!-- 8 : PROGRÈS -->
+    <main id="progress" class="tab-content">
+      <h3 class="section-title">📈 Mon suivi</h3>
+      <div class="stats-grid" id="statsGrid"></div>
+      <h4 class="sub-title">Points des 7 derniers jours</h4>
+      <div id="weekChart" class="week-chart"></div>
+      <h4 class="sub-title">Derniers quiz</h4>
+      <div id="historyList" class="list-box"></div>
+      <h4 class="sub-title">Mots à revoir (révision espacée)</h4>
+      <div id="mistakesList" class="list-box"></div>
+      <div class="card-actions" style="margin-top:16px">
+        <span></span>
+        <button class="btn danger small" id="resetProgressBtn" type="button">Effacer ma progression</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

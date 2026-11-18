@@ -1,0 +1,59 @@
+/* LinguaAI — mise en page mobile (à charger APRÈS style.css) */
+html, body { max-width: 100%; overflow-x: hidden; }
+body {
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+@media (max-width: 720px) {
+  body { padding-left: 10px; padding-right: 10px; }
+  .app, .topbar, .tab-content { max-width: 100%; }
+
+  /* En-tête : tout sur la largeur de l'écran */
+  .topbar { padding: 14px; }
+  .brand p { font-size: .75rem; }
+  .controls { width: 100%; }
+  .controls > * { flex: 1 1 auto; }
+  .lang-picker { flex: 1 1 100%; }
+  .lang-btn { width: 100%; }
+  #levelSelect { flex: 1 1 100%; width: 100%; }
+  .daily-goal { flex: 1 1 auto; justify-content: center; }
+  .goal-bar { width: 80px; }
+
+  /* Onglets : grille 4 x 2 au lieu d'une ligne qui déborde */
+  .tabs { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .tab-btn { white-space: normal; line-height: 1.2; padding: 9px 2px; font-size: .72rem; }
+
+  .tab-content { padding: 16px; }
+  .progress-info { flex-direction: column; gap: 4px; }
+
+  /* Cartes, quiz, exercices */
+  .flashcard-wrapper { height: 230px; }
+  .card-face h2 { font-size: 1.2rem; }
+  .card-actions .btn { flex: 1 1 30%; padding: 10px 8px; font-size: .85rem; }
+  .options-grid { grid-template-columns: 1fr; }
+  .exercise-tabs { flex-wrap: wrap; }
+  .pron-card h2 { font-size: 1.25rem; }
+  .pron-card { padding: 20px 14px; }
+
+  /* Chat */
+  .chat-window { height: 280px; }
+  .msg { max-width: 92%; }
+  .chat-form { gap: 6px; }
+  .tutor-header { flex-direction: column; }
+
+  /* Face-à-face */
+  .live-top { flex-direction: column; align-items: stretch; }
+  .live-picks { display: flex; flex-direction: column; gap: 8px; }
+  .avatar-pick { justify-content: space-between; }
+  .avatar-pick select { flex: 1; max-width: 70%; }
+  .video-screens { grid-template-columns: 1fr; gap: 12px; }
+  .screen { height: 240px; }
+  .live-controls .btn { flex: 1 1 45%; }
+  .live-dialogue-box { max-height: 200px; }
+
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Évite le zoom automatique quand on touche un champ de saisie */
+select, input[type="text"], input[type="password"] { font-size: 16px; }
